@@ -21,19 +21,31 @@ resource "aws_instance" "myec2" {
   instance_type   = var.instancetype
   key_name        = "devops-nicolas"
   tags            = var.aws_common_tag
-  security_groups = ["${aws_security_group.allow_http_https.name}"]
+  security_groups = ["${aws_security_group.allow_ssh_http_https.name}"]
 
+  
+  provisioner "remote-exec" {
+     inline = [
+       "sudo amazon-linux-extras install -y nginx1.12",
+       "sudo systemctl start nginx"
+     ]
 
+   connection {
+     type = "ssh"
+     user = "ec2-user"
+     private_key = file("./devops-nicolas.pem")
+     host = self.public_ip
+   }
+   }
   root_block_device {
     delete_on_termination = true
   }
 
 }
 
-resource "aws_security_group" "allow_http_https" {
-  name        = "nicolas-sg"
-  description = "allow_http_https inbound traffic"
-
+resource "aws_security_group" "allow_ssh_http_https" {
+  name        = "dirane-sg"
+  description = "Allow http and https inbound traffic"
 
   ingress {
     description = "TLS from VPC"
@@ -42,7 +54,6 @@ resource "aws_security_group" "allow_http_https" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
   ingress {
     description = "http from VPC"
     from_port   = 80
@@ -50,8 +61,22 @@ resource "aws_security_group" "allow_http_https" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  ingress {
+    description = "ssh from VPC"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
 }
+
 resource "aws_eip" "lb" {
   instance = aws_instance.myec2.id
   vpc      = true

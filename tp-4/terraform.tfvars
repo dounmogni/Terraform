@@ -1,8 +1,8 @@
-instancetype = "t2.micro"
+instancetype = "YOUR INSTACE TYPE"
 
 aws_common_tag = {
-  name : "ec2-Nicolas"
+  name : "YOUR TAG"
 }
 
-AWS_ACCESS_KEY = "PUT YOUR OWN"
-AWS_SECRET_KEY = "PUT YOUR OWN"
+AWS_ACCESS_KEY = "YOUR ACCES KEY"
+AWS_SECRET_KEY = "YOUR SECRET KEY"
