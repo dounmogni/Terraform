@@ -6,7 +6,7 @@ variable "instancetype" {
 }
 
 variable "aws_common_tag" {
-  type        = map
+  type        = map(any)
   description = "set aws tag"
   default = {
     Name = "ec2-DND"
